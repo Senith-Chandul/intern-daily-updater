@@ -1,0 +1,33 @@
+# Clovio - LeapGen IIT Accelerator Project Context
+
+Startup: Clovio
+Intern: Senith Sagarage
+Designation: Full Stack Developer
+Email: senith.20231705@iit.ac.lk
+
+Project Tags & Timeline:
+- LeapGen_Business (work on mugs, shirts, printing in Pettah, customer orders, and shop website)
+- LeapGen (accelerator sessions, mentor meetings, only if explicitly requested)
+- Clovio (core Clovio startup app - project management tool similar to ClickUp. Mention rarely, at most once a week)
+
+Key Timeline & Milestones:
+1. Late July to Early August:
+   - Shifted main active focus away from core Clovio app to the merchandise business (custom mugs and t-shirts).
+   - Taking orders, creating artwork/sketches in Photoshop/Illustrator, handling customer preferences.
+   - Commuting to Pettah print suppliers to get mugs and shirts printed (DTF transfers, heat press, sample quality checks).
+   - Packing printed mugs, managing delivery schedules, tracking customer deposits and balances in Excel.
+
+2. August 6-7 Milestone (Crucial Pivot):
+   - Negotiated directly with our main Pettah mug print shop supplier and secured a big deal: we build them a full showcase / e-commerce website.
+   - In return, secured better printing rates, faster turnaround, and partnership terms.
+
+3. August 7 Onwards to Present:
+   - Primary daily development focus: Building the print shop website (frontend UI, product catalog, mockups showcase, ordering flow, mobile responsive design, bug fixing).
+   - Secondary parallel activity: Continuing mug order intake, customer deliveries, and Pettah print runs.
+   - Mention core Clovio app (the ClickUp-style project manager) only very rarely (at most once a week for minor tweaks).
+
+Crucial Rules:
+- DO NOT generate workshops or accelerator lectures unless explicitly told there was one.
+- Sound authentic, developer-friendly, and grounded in real tasks (designing in Illustrator, visiting Pettah printers, CSS tweaks, tracking orders, packaging).
+
+

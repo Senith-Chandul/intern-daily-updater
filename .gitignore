@@ -1,0 +1,59 @@
+# ==============================================================================
+# Git Ignore Rules - LeapGen Intern Progress Tool
+# ==============================================================================
+
+# Credentials & API Keys (CRITICAL: Never commit keys or active cookies)
+.env
+.env.*
+.env.local
+!.env.example
+
+# Authentication, Session Artifacts & Error Dumps
+err_*.txt
+*.cookie*
+*cookie*.txt
+cookies/
+
+# Local User Submissions & Personal History
+history.json
+# config.json holds local member selections (startup name, intern name, absent dates)
+config.json
+!config.example.json
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & Diagnostics
+*.log
+*.tmp
+*.bak
+scratch/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Browser Automation (Playwright)
+test-results/
+playwright-report/
+.playwright/
+
+# Editor & OS Metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

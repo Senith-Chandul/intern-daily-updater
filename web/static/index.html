@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeapGen Intern Progress Studio - Material 3</title>
+  <!-- Google Fonts: Roboto & Material Symbols Outlined (M3 Standard) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="app" class="m3-app-shell">
+    
+    <!-- M3 Top App Bar -->
+    <header class="m3-top-app-bar">
+      <div class="m3-app-bar-leading">
+        <div class="m3-avatar-icon">
+          <span class="material-symbols-outlined">edit_calendar</span>
+        </div>
+        <div class="m3-app-bar-title-group">
+          <h1 class="m3-title-large">Intern Progress Studio</h1>
+          <span class="m3-body-small text-muted">LeapGen Accelerator · Standups & Google Form Autofill</span>
+        </div>
+      </div>
+
+      <div class="m3-app-bar-trailing">
+        <!-- Credentials & Setup Button -->
+        <button id="credentials-modal-btn" class="m3-chip m3-chip-assist" title="Configure API Keys & Google Cookie">
+          <span class="material-symbols-outlined chip-icon" id="credentials-status-icon">key</span>
+          <span class="chip-label" id="credentials-chip-label">Keys & Profile</span>
+        </button>
+
+        <!-- Target Toggle Chip -->
+        <button id="target-toggle-btn" class="m3-chip m3-chip-filter active" title="Toggle submission target">
+          <span class="material-symbols-outlined chip-icon">check</span>
+          <span class="chip-label">Target: <strong id="target-val">OFFICIAL</strong></span>
+        </button>
+
+        <!-- Intern / Startup Info Chip -->
+        <div class="m3-chip m3-chip-assist" id="profile-chip">
+          <span class="material-symbols-outlined chip-icon">badge</span>
+          <span class="chip-label"><span id="intern-name-val">Loading...</span> · <span id="startup-name-val">Clovio</span></span>
+        </div>
+
+        <!-- History Action -->
+        <button id="history-modal-btn" class="m3-icon-button" title="Submission History">
+          <span class="material-symbols-outlined">history</span>
+          <span id="history-count-badge" class="m3-badge">0</span>
+        </button>
+
+        <!-- Settings Action -->
+        <button id="settings-modal-btn" class="m3-icon-button" title="Settings & Context">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="m3-main-container">
+
+      <!-- M3 General Direction Search / Surface Card -->
+      <section class="m3-card m3-card-surface-container general-phase-card">
+        <div class="general-phase-inner">
+          <div class="phase-leading-icon">
+            <span class="material-symbols-outlined">explore</span>
+          </div>
+          <div class="phase-content-col">
+            <div class="phase-header-row">
+              <span class="m3-label-medium text-primary">Multi-Day General Direction (Carried across all days)</span>
+              <span class="m3-body-small text-muted">Used by Gemini to ensure smooth day-to-day progression</span>
+            </div>
+            <div class="phase-input-row">
+              <div class="m3-text-field outlined-field dense">
+                <input type="text" id="general-phase-input" placeholder="e.g. Building Pettah print shop website and fulfilling custom mug orders..." value="Building Pettah print shop website and fulfilling custom mug orders">
+              </div>
+              <button id="save-phase-btn" class="m3-button m3-button-filled-tonal">
+                <span class="material-symbols-outlined">save</span>
+                <span>Set Phase</span>
+              </button>
+            </div>
+            <!-- Quick Assist Chips -->
+            <div class="m3-chip-set">
+              <button class="m3-chip m3-chip-assist quick-phase-chip" data-text="Building Pettah print shop website and fulfilling custom mug orders">
+                <span class="chip-label">Print Shop Website & Mugs</span>
+              </button>
+              <button class="m3-chip m3-chip-assist quick-phase-chip" data-text="Vectorizing customer mug designs in Illustrator and Pettah print shop pickups">
+                <span class="chip-label">Illustrator & Pettah Pickups</span>
+              </button>
+              <button class="m3-chip m3-chip-assist quick-phase-chip" data-text="Preparing 90-day progress demo presentation and organizing work logs">
+                <span class="chip-label">90-Day Demo Slides</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- M3 Horizontal Timeline / Day Stepper -->
+      <section class="m3-timeline-section">
+        <div class="timeline-header-bar">
+          <div class="timeline-title-row">
+            <span class="material-symbols-outlined text-muted">calendar_view_week</span>
+            <h2 class="m3-title-medium">Standup Calendar & Catch-Up Stepper</h2>
+          </div>
+          <div class="m3-status-legend">
+            <span class="legend-pill submitted"><span class="legend-dot"></span><span id="stat-submitted-count">0</span> Submitted</span>
+            <span class="legend-pill pending"><span class="legend-dot"></span><span id="stat-pending-count">0</span> Pending Catch-up</span>
+            <span class="legend-pill absent"><span class="legend-dot"></span><span id="stat-absent-count">0</span> Absent</span>
+          </div>
+        </div>
+
+        <div class="timeline-scroll-track">
+          <div id="timeline-strip" class="timeline-chip-set">
+            <!-- Populated by JS -->
+            <div class="loading-chip">Loading dates...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Day Studio Workspace Card -->
+      <section class="m3-card m3-card-surface-container-high studio-workspace-card">
+
+        <!-- Card Header Banner -->
+        <div class="workspace-header-bar">
+          <div class="date-header-group">
+            <div class="date-indicator-circle" id="active-day-status-dot"></div>
+            <div>
+              <div class="date-headline-row">
+                <h2 id="active-date-title" class="m3-headline-medium">2026-09-10</h2>
+                <span id="active-weekday-badge" class="m3-chip m3-chip-assist weekday-chip">Thursday</span>
+                <span id="active-status-badge" class="m3-badge-pill pending">Pending Catch-up</span>
+              </div>
+              <span id="active-date-subtitle" class="m3-body-small text-muted">Ready to generate, review, and submit daily progress</span>
+            </div>
+          </div>
+
+          <!-- Header Quick Action Buttons -->
+          <div class="workspace-actions-group">
+            <button id="workshop-toggle-btn" class="m3-button m3-button-outlined" title="Toggle 3-hour LeapGen session">
+              <span class="material-symbols-outlined">school</span>
+              <span id="workshop-btn-label">+ Add Workshop (3h)</span>
+            </button>
+            <button id="mark-absent-btn" class="m3-button m3-button-outlined" title="Mark this day as absent">
+              <span class="material-symbols-outlined">event_busy</span>
+              <span id="absent-btn-label">Mark Absent</span>
+            </button>
+            <button id="generate-ai-btn" class="m3-button m3-button-filled-tonal">
+              <span class="material-symbols-outlined">auto_awesome</span>
+              <span>Generate with AI</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Single Day Focus Bar -->
+        <div class="single-focus-container">
+          <div class="m3-text-field outlined-field focus-field">
+            <span class="material-symbols-outlined leading-icon">target</span>
+            <input type="text" id="day-focus-input" placeholder="Today's specific focus (optional, e.g. Fixed checkout page styling, collected mug prints in Pettah...)">
+          </div>
+        </div>
+
+        <!-- Two Column Tasks Layout -->
+        <div class="m3-grid-2col">
+          <!-- Tasks I Did Today -->
+          <div class="m3-card m3-card-surface task-editor-panel">
+            <div class="panel-header-row">
+              <label for="tasks-today-input" class="m3-label-large">
+                <span class="material-symbols-outlined panel-icon">task_alt</span>
+                <span>Tasks I did today</span>
+                <span class="text-error">*</span>
+              </label>
+              <button id="sync-lines-to-items-btn" class="m3-button m3-button-text btn-dense" title="Sync lines into breakdown cards below">
+                <span class="material-symbols-outlined">sync</span>
+                <span>Sync to Cards</span>
+              </button>
+            </div>
+            <div class="m3-text-field outlined-field textarea-field">
+              <textarea id="tasks-today-input" rows="6" placeholder="1. LeapGen_Business : Details...&#10;2. Clovio : Details..."></textarea>
+            </div>
+            <div class="panel-footer-row">
+              <span id="today-task-lines-count" class="m3-body-small text-muted">0 tasks detected</span>
+              <span class="m3-body-small text-muted">Format: 1. Project : Task</span>
+            </div>
+          </div>
+
+          <!-- Tasks I Did Yesterday -->
+          <div class="m3-card m3-card-surface task-editor-panel">
+            <div class="panel-header-row">
+              <label for="tasks-yesterday-input" class="m3-label-large">
+                <span class="material-symbols-outlined panel-icon">history_edu</span>
+                <span>Tasks I did yesterday</span>
+                <span class="text-error">*</span>
+              </label>
+              <button id="refill-yesterday-btn" class="m3-button m3-button-text btn-dense" title="Reset to yesterday's submitted tasks">
+                <span class="material-symbols-outlined">restart_alt</span>
+                <span>Reset</span>
+              </button>
+            </div>
+            <div class="m3-text-field outlined-field textarea-field">
+              <textarea id="tasks-yesterday-input" rows="6" placeholder="1. LeapGen_Business : Details...&#10;2. Clovio : Details..."></textarea>
+            </div>
+            <div class="panel-footer-row">
+              <span class="m3-body-small text-muted">Chained automatically from previous day</span>
+              <span class="m3-body-small text-muted">Format: 1. Project : Task</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- M3 Task Breakdown & Hours Meter Section -->
+        <div class="m3-card m3-card-surface breakdown-panel">
+          <div class="breakdown-header-row">
+            <div>
+              <h3 class="m3-title-medium">Task Items Breakdown & Work Hours</h3>
+              <p class="m3-body-small text-muted">Each task item below corresponds directly to Google Form Page 2 fields. Total hours must sum to 6.0 – 9.0 hrs.</p>
+            </div>
+
+            <!-- M3 Linear Hours Meter -->
+            <div class="m3-hours-meter-card">
+              <div class="hours-meter-header">
+                <span class="m3-label-small text-muted">TOTAL WORK HOURS</span>
+                <span id="total-hours-value" class="m3-title-large hours-display valid">7.5 hrs</span>
+              </div>
+              <div class="m3-linear-progress-track">
+                <div class="m3-safe-zone-marker" title="Acceptable Workday Window: 6.0 - 9.0 hrs"></div>
+                <div id="hours-progress-bar" class="m3-linear-progress-fill" style="width: 75%;"></div>
+              </div>
+              <div class="hours-scale-row">
+                <span>0h</span>
+                <span>3h</span>
+                <span class="safe-tag">6h</span>
+                <span class="safe-tag">9h</span>
+                <span>12h</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Task Cards List -->
+          <div id="task-cards-list" class="task-cards-container">
+            <!-- Populated by JS -->
+          </div>
+
+          <div class="breakdown-action-toolbar">
+            <button id="add-task-card-btn" class="m3-button m3-button-outlined">
+              <span class="material-symbols-outlined">add</span>
+              <span>Add Task</span>
+            </button>
+            <button id="autobalance-hours-btn" class="m3-button m3-button-filled-tonal" title="Automatically scale task hours to equal exactly 7.5 hrs">
+              <span class="material-symbols-outlined">balance</span>
+              <span>Auto-Balance to 7.5h</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Challenges Faced Section -->
+        <div class="m3-card m3-card-surface challenges-panel">
+          <div class="challenges-header">
+            <label for="challenges-input" class="m3-label-large">
+              <span class="material-symbols-outlined panel-icon">report_problem</span>
+              <span>Challenges faced</span>
+              <span class="text-error">*</span>
+            </label>
+            <div class="m3-chip-set challenges-chips">
+              <button class="m3-chip m3-chip-assist challenge-preset-chip" data-text="None"><span class="chip-label">None</span></button>
+              <button class="m3-chip m3-chip-assist challenge-preset-chip" data-text="No major blockers today."><span class="chip-label">No major blockers</span></button>
+              <button class="m3-chip m3-chip-assist challenge-preset-chip" data-text="Traffic in Pettah delayed print collection slightly, but all orders completed on time."><span class="chip-label">Pettah traffic</span></button>
+              <button class="m3-chip m3-chip-assist challenge-preset-chip" data-text="Minor responsive layout bugs on smaller mobile screens, resolved with CSS fixes."><span class="chip-label">Mobile CSS bug</span></button>
+            </div>
+          </div>
+          <div class="m3-text-field outlined-field">
+            <input type="text" id="challenges-input" placeholder="None / No major blockers today">
+          </div>
+        </div>
+
+        <!-- M3 Bottom Action Bar -->
+        <div class="m3-bottom-action-bar">
+          <div class="submission-target-meta">
+            <div class="target-status-dot"></div>
+            <div class="target-labels">
+              <span class="m3-label-small text-muted">SUBMITTING TO:</span>
+              <strong id="submission-target-label" class="m3-body-medium">OFFICIAL Google Form</strong>
+            </div>
+            <label class="m3-checkbox-label">
+              <input type="checkbox" id="dry-run-checkbox">
+              <span class="m3-body-small">Dry Run only (Validate without sending)</span>
+            </label>
+          </div>
+
+          <div class="action-buttons-row">
+            <button id="next-day-btn" class="m3-button m3-button-outlined" title="Advance to next missing weekday">
+              <span>Next Day</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+            <button id="submit-form-btn" class="m3-button m3-button-filled">
+              <span class="material-symbols-outlined">send</span>
+              <span id="submit-btn-text">Submit to Google Form</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Live Console Drawer -->
+    <div id="console-drawer" class="m3-console-drawer">
+      <div class="console-drag-handle" id="console-header-handle">
+        <div class="console-handle-indicator"></div>
+        <div class="console-status-row">
+          <span class="console-status-dot" id="console-status-dot"></span>
+          <span id="console-status-title" class="m3-label-medium">System Ready</span>
+        </div>
+        <button id="close-console-btn" class="m3-icon-button btn-xs" title="Toggle Drawer">
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
+      </div>
+      <div id="console-logs" class="console-logs-content">
+        <div class="log-line info">LeapGen Intern Progress Studio initialized with Material 3.</div>
+      </div>
+    </div>
+
+    <!-- M3 History Modal / Dialog -->
+    <div id="history-modal" class="m3-dialog-backdrop hidden">
+      <div class="m3-dialog-surface">
+        <div class="m3-dialog-header">
+          <div class="dialog-title-group">
+            <span class="material-symbols-outlined text-primary">history</span>
+            <h3 class="m3-headline-small">Submission History Archive</h3>
+          </div>
+          <button id="close-history-modal-btn" class="m3-icon-button">&times;</button>
+        </div>
+        <div class="m3-dialog-body">
+          <p class="m3-body-medium text-muted">All recorded daily updates stored in <code>history.json</code>:</p>
+          <div id="history-list" class="history-cards-scroll">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3 Credentials & Onboarding Setup Modal -->
+    <div id="credentials-modal" class="m3-dialog-backdrop hidden">
+      <div class="m3-dialog-surface">
+        <div class="m3-dialog-header">
+          <div class="dialog-title-group">
+            <span class="material-symbols-outlined text-primary">vpn_key</span>
+            <h3 class="m3-headline-small">Credentials & Intern Profile Setup</h3>
+          </div>
+          <button id="close-credentials-modal-btn" class="m3-icon-button">&times;</button>
+        </div>
+        <div class="m3-dialog-body">
+          <div class="setup-notice-box">
+            <span class="material-symbols-outlined notice-icon">verified_user</span>
+            <p class="m3-body-small">
+              Welcome LeapGen member! Enter your Google Gemini API key to write realistic daily reports, and your @iit.ac.lk session cookie to authorize official submissions.
+            </p>
+          </div>
+
+          <!-- Step 1: Gemini API Key -->
+          <div class="setup-section-card">
+            <div class="setup-section-header">
+              <div class="step-badge">1</div>
+              <div class="step-titles">
+                <h4 class="m3-title-medium">Google Gemini API Key</h4>
+                <p class="m3-body-small text-muted">Free AI engine used to synthesize professional standup reports</p>
+              </div>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="m3-button m3-button-text btn-dense" title="Get a 100% free Gemini API key">
+                <span>Get Free Key</span>
+                <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+              </a>
+            </div>
+            <div class="setup-key-input-row">
+              <div class="m3-text-field outlined-field" style="flex: 1;">
+                <input type="password" id="setup-gemini-key-input" placeholder="AIzaSy... (Paste your Gemini API key here)">
+              </div>
+              <button id="toggle-key-visibility-btn" class="m3-icon-button" title="Show/Hide Key">
+                <span class="material-symbols-outlined" id="key-vis-icon">visibility</span>
+              </button>
+              <button id="test-gemini-key-btn" class="m3-button m3-button-outlined">
+                <span class="material-symbols-outlined">network_check</span>
+                <span>Verify</span>
+              </button>
+            </div>
+            <span id="gemini-key-status-text" class="m3-body-small text-muted"></span>
+          </div>
+
+          <!-- Step 2: Google Form Cookie -->
+          <div class="setup-section-card">
+            <div class="setup-section-header">
+              <div class="step-badge">2</div>
+              <div class="step-titles">
+                <h4 class="m3-title-medium">Google Form Session Cookie (@iit.ac.lk)</h4>
+                <p class="m3-body-small text-muted">Authorizes Google Form submissions with your student account</p>
+              </div>
+            </div>
+            <details class="cookie-instructions-details">
+              <summary class="m3-label-small text-primary">How to copy your cookie in 20 seconds (Click to expand guide)</summary>
+              <ol class="cookie-steps-list m3-body-small">
+                <li>Open <strong>Google Chrome or Edge</strong> and go to the <a href="https://docs.google.com/forms/d/e/1FAIpQLSclwYWri8MXXTa9wHDyn3fuBopn33F-eyi_Oi2aF7WUJCRE_g/viewform" target="_blank">LeapGen Form</a> while logged into your <code>@iit.ac.lk</code> account.</li>
+                <li>Press <strong>F12</strong> (Inspect) &rarr; switch to the <strong>Network</strong> tab.</li>
+                <li>Refresh the page (F5), click on the first network request named <strong><code>viewform</code></strong>.</li>
+                <li>In the right panel under <strong>Request Headers</strong>, find <strong><code>Cookie:</code></strong>.</li>
+                <li>Right-click the cookie value &rarr; <strong>Copy value</strong> &rarr; paste it in the box below.</li>
+              </ol>
+            </details>
+            <div class="m3-text-field outlined-field textarea-field">
+              <textarea id="setup-cookie-input" rows="3" placeholder="S=spreadsheet_forms=...; SID=... (Paste entire Cookie header value here)"></textarea>
+            </div>
+          </div>
+
+          <!-- Step 3: Startup Profile -->
+          <div class="setup-section-card">
+            <div class="setup-section-header">
+              <div class="step-badge">3</div>
+              <div class="step-titles">
+                <h4 class="m3-title-medium">Your LeapGen Intern Profile</h4>
+                <p class="m3-body-small text-muted">Select your startup and name as listed in the accelerator form</p>
+              </div>
+            </div>
+            <div class="m3-grid-2col" style="gap: 12px;">
+              <div class="dialog-form-row">
+                <label for="setup-startup-select" class="m3-label-medium">Startup:</label>
+                <select id="setup-startup-select" class="m3-select"></select>
+              </div>
+              <div class="dialog-form-row">
+                <label for="setup-intern-select" class="m3-label-medium">Intern Name:</label>
+                <select id="setup-intern-select" class="m3-select"></select>
+              </div>
+              <div class="dialog-form-row">
+                <label for="setup-designation-input" class="m3-label-medium">Designation:</label>
+                <div class="m3-text-field outlined-field dense">
+                  <input type="text" id="setup-designation-input" placeholder="e.g. Software Engineering Intern">
+                </div>
+              </div>
+              <div class="dialog-form-row">
+                <label for="setup-email-input" class="m3-label-medium">IIT Student Email:</label>
+                <div class="m3-text-field outlined-field dense">
+                  <input type="email" id="setup-email-input" placeholder="e.g. yourname.2023xxxx@iit.ac.lk">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="m3-dialog-actions">
+            <button id="cancel-credentials-btn" class="m3-button m3-button-text">Close</button>
+            <button id="save-credentials-btn" class="m3-button m3-button-filled">
+              <span class="material-symbols-outlined">save</span>
+              <span>Save & Apply Settings</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3 Settings Modal / Dialog -->
+    <div id="settings-modal" class="m3-dialog-backdrop hidden">
+      <div class="m3-dialog-surface">
+        <div class="m3-dialog-header">
+          <div class="dialog-title-group">
+            <span class="material-symbols-outlined text-primary">tune</span>
+            <h3 class="m3-headline-small">Settings & Context</h3>
+          </div>
+          <button id="close-settings-modal-btn" class="m3-icon-button">&times;</button>
+        </div>
+        <div class="m3-dialog-body">
+          <div class="dialog-form-row">
+            <label for="settings-target-select" class="m3-label-medium">Active Form Target:</label>
+            <select id="settings-target-select" class="m3-select">
+              <option value="official">Official LeapGen Accelerator Form (@iit.ac.lk)</option>
+              <option value="test">Extracted Test Form</option>
+            </select>
+          </div>
+
+          <div class="dialog-form-row">
+            <label for="settings-model-input" class="m3-label-medium">Gemini AI Model:</label>
+            <div class="m3-text-field outlined-field">
+              <input type="text" id="settings-model-input" value="gemini-3.6-flash">
+            </div>
+          </div>
+
+          <div class="dialog-form-row">
+            <label for="settings-context-textarea" class="m3-label-medium">Startup Story & Context Notes (context.txt):</label>
+            <div class="m3-text-field outlined-field textarea-field">
+              <textarea id="settings-context-textarea" rows="8"></textarea>
+            </div>
+          </div>
+
+          <div class="m3-dialog-actions">
+            <button id="save-settings-btn" class="m3-button m3-button-filled">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3 Snackbar Notification Area -->
+    <div id="toast-container" class="m3-snackbar-container"></div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

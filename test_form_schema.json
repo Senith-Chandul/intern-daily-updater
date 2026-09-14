@@ -1,0 +1,39 @@
+{
+  "title": "Google Form",
+  "view_url": "https://docs.google.com/forms/d/e/1FAIpQLSc9v7B37abD5zX8jzlM91ch4i83H7-mDDiCYZ6qqwoe06UxNQ/viewform",
+  "submit_url": "https://docs.google.com/forms/d/e/1FAIpQLSc9v7B37abD5zX8jzlM91ch4i83H7-mDDiCYZ6qqwoe06UxNQ/formResponse",
+  "email": "emailAddress",
+  "continuation": {
+    "1": "entry.689732738",
+    "2": "entry.354144568",
+    "3": "entry.640437552",
+    "4": "entry.525882822"
+  },
+  "status": {
+    "1": "entry.1026631569",
+    "2": "entry.1488300077",
+    "3": "entry.690426246",
+    "4": "entry.975041468"
+  },
+  "time_spent": {
+    "1": "entry.1707084877",
+    "2": "entry.1474310717",
+    "3": "entry.583861263",
+    "4": "entry.1663514183"
+  },
+  "completion_date": {
+    "1": "entry.189605617",
+    "2": "entry.1744086859",
+    "3": "entry.868925656",
+    "4": "entry.1009146982"
+  },
+  "page_count": 2,
+  "startup_name": "entry.1882789472",
+  "intern_name": "entry.501654788",
+  "designation": "entry.138623894",
+  "today_date": "entry.1693799347",
+  "tasks_yesterday": "entry.1402916595",
+  "tasks_today": "entry.1519200013",
+  "challenges": "entry.2058618680",
+  "page_history": "0,1"
+}

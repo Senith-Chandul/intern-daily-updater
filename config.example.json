@@ -1,0 +1,43 @@
+{
+  "startup_name": "Clovio",
+  "intern_name": "Intern Name",
+  "designation": "Software Engineering Intern",
+  "email": "your_email@iit.ac.lk",
+  "project_name": "Clovio",
+  "gemini_model": "gemini-flash-latest",
+  "active_target": "official",
+  "test_form_url": "https://docs.google.com/forms/d/e/1FAIpQLSc9v7B37abD5zX8jzlM91ch4i83H7-mDDiCYZ6qqwoe06UxNQ/viewform",
+  "official_form_url": "https://docs.google.com/forms/d/e/1FAIpQLSclwYWri8MXXTa9wHDyn3fuBopn33F-eyi_Oi2aF7WUJCRE_g/viewform",
+  "_comment_available_startups": [
+    "Yamu Car Rentals",
+    "Trivista Labs",
+    "The Astryd Labs",
+    "QuickBrix",
+    "Axacrate Technologies",
+    "Alertrix",
+    "Dectave",
+    "Clovio"
+  ],
+  "_comment_available_intern_names": [
+    "Vihanga Randima",
+    "Danuka Dulanjan",
+    "Yasira Asanjith",
+    "Esala Gamage",
+    "Umesh Isuranga",
+    "Dulaj Yuthsara Jayasingha",
+    "Vihara Senanayake",
+    "Jalitha Tharindu de Silva",
+    "Venuja Ransika",
+    "Waseem Kaleel",
+    "Chanith Thewnaka",
+    "B A Daniru R Senarathne",
+    "Sevin Kawsika",
+    "Thivina Hettiaraachchi",
+    "Bhadrash Chandramohan",
+    "Sashrika Vidanagama",
+    "Punsara Rajapaksa",
+    "Senith Sagarage"
+  ],
+  "absent_dates": [],
+  "default_target": "official"
+}
