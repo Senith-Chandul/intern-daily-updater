@@ -41,6 +41,8 @@ No manual file editing is required! When you run the tool for the first time, it
 3. **Startup & Intern Profile**:
    - Offers number-choice selection from the official **8 LeapGen Startups** (*Yamu Car Rentals, Trivista Labs, The Astryd Labs, QuickBrix, Axacrate Technologies, Alertrix, Dectave, Clovio*).
    - Offers number-choice selection from the official **18 LeapGen Intern Names**.
+4. **💡 Instant Fast-Track (Paste Confirmation Emails)**:
+   - If you have past Google Form confirmation emails in your Gmail inbox, paste them directly into the tool (CLI or Web Studio). Gemini will automatically extract your name, startup, and past submissions into `history.json`!
 
 To re-run the setup at any time:
 ```bash
