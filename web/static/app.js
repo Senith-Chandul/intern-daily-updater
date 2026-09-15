@@ -54,6 +54,21 @@ const elements = {
   setupDesignationInput: document.getElementById('setup-designation-input'),
   setupEmailInput: document.getElementById('setup-email-input'),
 
+  // Email Import Elements
+  importEmailModalBtn: document.getElementById('import-email-modal-btn'),
+  importEmailModal: document.getElementById('import-email-modal'),
+  closeImportEmailModalBtn: document.getElementById('close-import-email-modal-btn'),
+  cancelImportEmailBtn: document.getElementById('cancel-import-email-btn'),
+  submitImportEmailBtn: document.getElementById('submit-import-email-btn'),
+  doneImportEmailBtn: document.getElementById('done-import-email-btn'),
+  importEmailTextarea: document.getElementById('import-email-textarea'),
+  importEmailBtnText: document.getElementById('import-email-btn-text'),
+  importEmailResultCard: document.getElementById('import-email-result-card'),
+  importResultTitle: document.getElementById('import-result-title'),
+  importResultSummary: document.getElementById('import-result-summary'),
+  importResultDetails: document.getElementById('import-result-details'),
+  shortcutImportEmailBtn: document.getElementById('shortcut-import-email-btn'),
+
   generalPhaseInput: document.getElementById('general-phase-input'),
   savePhaseBtn: document.getElementById('save-phase-btn'),
 
@@ -908,6 +923,75 @@ async function saveCredentials() {
   }
 }
 
+// Email Import Modal
+function openImportEmailModal() {
+  elements.importEmailModal.classList.remove('hidden');
+  elements.importEmailResultCard.classList.add('hidden');
+  elements.doneImportEmailBtn.classList.add('hidden');
+  elements.submitImportEmailBtn.classList.remove('hidden');
+  elements.importEmailTextarea.focus();
+}
+
+function closeImportEmailModal() {
+  elements.importEmailModal.classList.add('hidden');
+}
+
+async function submitImportEmail() {
+  const rawText = elements.importEmailTextarea.value.trim();
+  if (!rawText) {
+    showSnackbar('Please paste your confirmation email text before importing.', 'error');
+    return;
+  }
+
+  elements.submitImportEmailBtn.disabled = true;
+  elements.importEmailBtnText.textContent = 'Parsing with Gemini AI...';
+  logMessage('Sending confirmation email text to Gemini AI for parsing and auto-fill...');
+
+  try {
+    const res = await fetch('/api/import-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ raw_text: rawText }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to parse confirmation email');
+    }
+
+    const data = await res.json();
+    const prof = data.profile || {};
+    const dates = data.imported_dates || [];
+
+    // Update Result Preview Card
+    elements.importResultTitle.textContent = `Imported ${dates.length} Submission(s) Successfully!`;
+    elements.importResultSummary.textContent = `Profile and history have been automatically configured.`;
+    elements.importResultDetails.innerHTML = `
+      <div style="margin-bottom: 6px;"><strong>Intern:</strong> ${escapeHtml(prof.intern_name || 'N/A')} · <strong>Startup:</strong> ${escapeHtml(prof.startup_name || 'N/A')}</div>
+      <div style="margin-bottom: 6px;"><strong>Email:</strong> ${escapeHtml(prof.email || 'N/A')} · <strong>Designation:</strong> ${escapeHtml(prof.designation || 'N/A')}</div>
+      <div><strong>Imported Dates (${dates.length}):</strong> <span class="text-primary">${dates.join(', ') || 'None'}</span></div>
+    `;
+    elements.importEmailResultCard.classList.remove('hidden');
+
+    elements.submitImportEmailBtn.classList.add('hidden');
+    elements.doneImportEmailBtn.classList.remove('hidden');
+
+    logMessage(`[SUCCESS] Imported ${dates.length} submissions for ${prof.intern_name} (${prof.startup_name}).`, 'success');
+    showSnackbar(`Successfully imported profile and ${dates.length} submission(s)!`, 'success');
+
+    // Refresh state in background
+    await fetchStatus();
+    await checkCredentials(false);
+    await fetchDates();
+  } catch (err) {
+    logMessage(`Email import error: ${err.message}`, 'error');
+    showSnackbar(`Email import failed: ${err.message}`, 'error');
+  } finally {
+    elements.submitImportEmailBtn.disabled = false;
+    elements.importEmailBtnText.textContent = 'Parse & Import with AI';
+  }
+}
+
 function escapeHtml(str) {
   return str
     .replace(/&/g, '&amp;')
@@ -988,6 +1072,22 @@ function initEventListeners() {
   elements.toggleKeyVisibilityBtn.addEventListener('click', toggleKeyVisibility);
   elements.testGeminiKeyBtn.addEventListener('click', testGeminiKey);
   elements.saveCredentialsBtn.addEventListener('click', saveCredentials);
+
+  // Email Import Modal Events
+  elements.importEmailModalBtn.addEventListener('click', openImportEmailModal);
+  elements.closeImportEmailModalBtn.addEventListener('click', closeImportEmailModal);
+  elements.cancelImportEmailBtn.addEventListener('click', closeImportEmailModal);
+  elements.submitImportEmailBtn.addEventListener('click', submitImportEmail);
+  elements.doneImportEmailBtn.addEventListener('click', () => {
+    closeImportEmailModal();
+    showSnackbar('Import applied! Timeline and profile refreshed.', 'success');
+  });
+  if (elements.shortcutImportEmailBtn) {
+    elements.shortcutImportEmailBtn.addEventListener('click', () => {
+      closeCredentialsModal();
+      openImportEmailModal();
+    });
+  }
 
   elements.tasksTodayInput.addEventListener('input', updateLineCounts);
 

@@ -187,8 +187,23 @@ def interactive_cli_setup(base_dir: Path, config: Dict[str, Any], force: bool = 
             print("[Notice] Cookie skipped. You can still test with test forms or set it later.")
 
     # Step 3: Startup Profile
-    print("\n--- STEP 3: Your Startup Profile ---")
-    print("Choose your startup from the official LeapGen accelerator cohort:")
+    print("\n--- STEP 3: Your Startup Profile & Past Submissions ---")
+    print("💡 Fast-Track: If you have Google Form confirmation email receipts in your inbox,")
+    print("   you can paste them now to automatically detect your name, startup, and past submissions!")
+    fast_track = input("Paste confirmation email(s) now to auto-fill? [y/N]: ").strip().lower()
+    if fast_track in ["y", "yes"]:
+        try:
+            from email_importer import cli_import_confirmation_emails, load_config_data
+            if cli_import_confirmation_emails(base_dir, config):
+                config = load_config_data(base_dir)
+                print("=" * 70)
+                print("          SETUP COMPLETE! ALL CREDENTIALS & PROFILE SAVED")
+                print("=" * 70)
+                return config
+        except Exception as e:
+            print(f"[Notice] Email import encountered an error ({e}). Continuing with manual profile selection...\n")
+
+    print("\nChoose your startup from the official LeapGen accelerator cohort:")
     for i, st in enumerate(STARTUP_OPTIONS, 1):
         is_curr = " (current)" if st == config.get("startup_name") else ""
         print(f"  [{i}] {st}{is_curr}")

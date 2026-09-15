@@ -33,6 +33,12 @@
           <span class="chip-label" id="credentials-chip-label">Keys & Profile</span>
         </button>
 
+        <!-- Import Confirmation Emails Button -->
+        <button id="import-email-modal-btn" class="m3-chip m3-chip-assist" title="Import profile & past updates from confirmation emails">
+          <span class="material-symbols-outlined chip-icon" style="color: #64b5f6;">mark_email_read</span>
+          <span class="chip-label">Import Emails</span>
+        </button>
+
         <!-- Target Toggle Chip -->
         <button id="target-toggle-btn" class="m3-chip m3-chip-filter active" title="Toggle submission target">
           <span class="material-symbols-outlined chip-icon">check</span>
@@ -416,6 +422,14 @@
                 <h4 class="m3-title-medium">Your LeapGen Intern Profile</h4>
                 <p class="m3-body-small text-muted">Select your startup and name as listed in the accelerator form</p>
               </div>
+            <div style="margin-bottom: 12px; padding: 10px 14px; background: rgba(100, 181, 246, 0.08); border-radius: 8px; border: 1px solid rgba(100, 181, 246, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+              <div class="m3-body-small" style="color: var(--md-sys-color-on-surface-variant);">
+                <strong>Fast-Track:</strong> Paste past confirmation email(s) to auto-fill your name, startup, and history!
+              </div>
+              <button id="shortcut-import-email-btn" class="m3-button m3-button-outlined btn-dense" type="button">
+                <span class="material-symbols-outlined" style="font-size: 16px;">mark_email_read</span>
+                <span>Paste Emails</span>
+              </button>
             </div>
             <div class="m3-grid-2col" style="gap: 12px;">
               <div class="dialog-form-row">
@@ -446,6 +460,61 @@
             <button id="save-credentials-btn" class="m3-button m3-button-filled">
               <span class="material-symbols-outlined">save</span>
               <span>Save & Apply Settings</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3 Import Confirmation Emails Modal -->
+    <div id="import-email-modal" class="m3-dialog-backdrop hidden">
+      <div class="m3-dialog-surface modal-lg">
+        <div class="m3-dialog-header">
+          <div class="dialog-title-group">
+            <span class="material-symbols-outlined text-primary">mark_email_read</span>
+            <h3 class="m3-headline-small">Import from Confirmation Emails</h3>
+          </div>
+          <button id="close-import-email-modal-btn" class="m3-icon-button">&times;</button>
+        </div>
+        <div class="m3-dialog-body">
+          <div class="setup-notice-box" style="background: rgba(100, 181, 246, 0.08); border-color: rgba(100, 181, 246, 0.25);">
+            <span class="material-symbols-outlined" style="color: #64b5f6;">auto_awesome</span>
+            <p class="m3-body-small">
+              Open your <strong>Gmail / Outlook (@iit.ac.lk)</strong> inbox, find your Google Form response receipts titled
+              <em>"Daily Intern Progress Update : LeapGen IIT Accelerator"</em>, copy the email text, and paste it below.
+              You can paste <strong>one email or multiple past emails</strong> together!
+              Gemini AI will automatically extract your name, startup, and record your daily updates into history.
+            </p>
+          </div>
+
+          <div class="dialog-form-row">
+            <label for="import-email-textarea" class="m3-label-medium">Paste Confirmation Email Text:</label>
+            <div class="m3-text-field outlined-field textarea-field">
+              <textarea id="import-email-textarea" rows="12" placeholder="Google Forms&#10;Thanks for filling out Daily Intern Progress Update : LeapGen IIT Accelerator&#10;Here's what was received...&#10;&#10;Email *&#10;your.email@iit.ac.lk&#10;Startup Name *&#10;..."></textarea>
+            </div>
+          </div>
+
+          <!-- Result Preview Card (hidden until parsed) -->
+          <div id="import-email-result-card" class="setup-section-card hidden" style="border-color: rgba(129, 199, 132, 0.4); background: rgba(129, 199, 132, 0.06);">
+            <div class="setup-section-header">
+              <span class="material-symbols-outlined" style="color: #81c784;">check_circle</span>
+              <div class="step-titles">
+                <h4 class="m3-title-medium" id="import-result-title" style="color: #81c784;">Import Successful!</h4>
+                <p class="m3-body-small text-muted" id="import-result-summary"></p>
+              </div>
+            </div>
+            <div id="import-result-details" class="m3-body-small" style="margin-top: 8px; line-height: 1.6;"></div>
+          </div>
+
+          <div class="m3-dialog-actions">
+            <button id="cancel-import-email-btn" class="m3-button m3-button-text">Cancel</button>
+            <button id="submit-import-email-btn" class="m3-button m3-button-filled">
+              <span class="material-symbols-outlined">auto_awesome</span>
+              <span id="import-email-btn-text">Parse & Import with AI</span>
+            </button>
+            <button id="done-import-email-btn" class="m3-button m3-button-filled hidden" style="background: #388e3c;">
+              <span class="material-symbols-outlined">done_all</span>
+              <span>Done & Apply to Studio</span>
             </button>
           </div>
         </div>

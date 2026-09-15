@@ -34,6 +34,7 @@ from credentials import (
     mask_secret,
 )
 from form_schema import STARTUP_OPTIONS, INTERN_NAMES
+from email_importer import import_confirmation_emails
 
 app = FastAPI(title="LeapGen Intern Progress Studio", version="1.0.0")
 
@@ -134,6 +135,10 @@ class FullSetupRequest(BaseModel):
 
 class TestKeyRequest(BaseModel):
     gemini_api_key: Optional[str] = None
+
+
+class EmailImportRequest(BaseModel):
+    raw_text: str
 
 
 @app.get("/")
@@ -417,6 +422,21 @@ def full_setup_endpoint(req: FullSetupRequest):
         "message": "Setup completed successfully! Profile and credentials saved.",
         "config": config,
     }
+
+
+@app.post("/api/import-email")
+def import_email_endpoint(req: EmailImportRequest):
+    try:
+        cfg = load_config()
+        model = cfg.get("gemini_model", "gemini-flash-latest")
+        res = import_confirmation_emails(
+            raw_email_text=req.raw_text,
+            base_dir=BASE_DIR,
+            model=model,
+        )
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def run_server(port: int = 5000, open_browser: bool = True):

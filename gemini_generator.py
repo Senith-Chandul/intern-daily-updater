@@ -322,3 +322,93 @@ class GeminiProgressGenerator:
             data["task_items"] = validate_and_normalize_hours(data["task_items"])
 
         return data
+
+    def parse_confirmation_emails(self, raw_email_text: str) -> Dict[str, Any]:
+        """
+        Parse raw Google Form confirmation email(s) copied from Gmail/inbox into structured
+        profile and daily submission history.
+        """
+        if not self.api_key:
+            raise ValueError(
+                "Gemini API Key not found!\n"
+                "Please configure your GEMINI_API_KEY before importing confirmation emails."
+            )
+
+        if not raw_email_text or not raw_email_text.strip():
+            raise ValueError("No email text provided to parse.")
+
+        system_instruction = (
+            "You are an expert data parsing system for the LeapGen IIT Accelerator daily progress reports. "
+            "Your job is to read raw text from Google Form confirmation emails (copied directly from Gmail or Outlook) "
+            "and parse all submitted responses and intern profile data into clean, strict JSON.\n\n"
+            "CONTEXT ABOUT THE FORM:\n"
+            "- Form: 'Daily Intern Progress Update : LeapGen IIT Accelerator'\n"
+            "- Startups: Yamu Car Rentals, Trivista Labs, The Astryd Labs, QuickBrix, Axacrate Technologies, Alertrix, Dectave, Clovio.\n\n"
+            "EXTRACTION REQUIREMENTS:\n"
+            "1. PROFILE:\n"
+            "   - Extract 'intern_name' (Full Name of the Intern).\n"
+            "   - Extract 'startup_name' (Startup Name, match to one of the 8 LeapGen startups).\n"
+            "   - Extract 'designation' (e.g. Software Engineering Intern, Full Stack Developer).\n"
+            "   - Extract 'email' (intern's @iit.ac.lk or other email address).\n"
+            "2. SUBMISSIONS:\n"
+            "   - The text may contain 1 confirmation email or multiple confirmation emails pasted consecutively.\n"
+            "   - For each submission found, extract:\n"
+            "     * 'date': in strict 'YYYY-MM-DD' format (convert from '7/24/2026', '24/07/2026', '2026-07-24', etc.).\n"
+            "     * 'tasks_yesterday': exact text under 'Tasks I did yesterday'.\n"
+            "     * 'tasks_today': exact text under 'Tasks I did today'.\n"
+            "     * 'task_items': array of task objects:\n"
+            "         - 'task_number': integer (1, 2, 3...)\n"
+            "         - 'title': concise task title\n"
+            "         - 'continuation': 'Yes' or 'No'\n"
+            "         - 'status': 'Completed' or 'In progress'\n"
+            "         - 'time_spent': float hours (e.g. 2.5, ensure total is reasonable 6.0-9.0 hrs)\n"
+            "         - 'completion_date': date in 'YYYY-MM-DD'\n"
+            "       If individual task breakdown items were omitted in the email, synthesize them directly from the lines in 'tasks_today'.\n"
+            "     * 'challenges': string under challenges faced, default to 'None' if empty.\n"
+            "3. Ensure submissions are sorted chronologically by date.\n"
+            "4. Return STRICT JSON with this exact structure:\n"
+            "{\n"
+            '  "profile": {\n'
+            '    "intern_name": "Full Name",\n'
+            '    "startup_name": "Startup Name",\n'
+            '    "designation": "Designation",\n'
+            '    "email": "user@iit.ac.lk"\n'
+            "  },\n"
+            '  "submissions": [\n'
+            "    {\n"
+            '      "date": "YYYY-MM-DD",\n'
+            '      "tasks_yesterday": "1. ...\\n2. ...",\n'
+            '      "tasks_today": "1. ...\\n2. ...",\n'
+            '      "task_items": [\n'
+            "        {\n"
+            '          "task_number": 1,\n'
+            '          "title": "Task title",\n'
+            '          "continuation": "No",\n'
+            '          "status": "Completed",\n'
+            '          "time_spent": 2.5,\n'
+            '          "completion_date": "YYYY-MM-DD"\n'
+            "        }\n"
+            "      ],\n"
+            '      "challenges": "None"\n'
+            "    }\n"
+            "  ]\n"
+            "}"
+        )
+
+        user_prompt = f"Here is the raw text from the confirmation email(s):\n\n{raw_email_text.strip()}\n\nParse into strict JSON matching the schema."
+
+        models_to_try = []
+        for m in [self.model, "gemini-flash-latest", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-3.6-flash"]:
+            if m and m not in models_to_try:
+                models_to_try.append(m)
+
+        full_prompt = system_instruction + "\n\n" + user_prompt
+        data = self._call_gemini_api(full_prompt, models_to_try)
+
+        # Post-process and normalize hours for each submission
+        submissions = data.get("submissions", [])
+        for sub in submissions:
+            if "task_items" in sub and sub["task_items"]:
+                sub["task_items"] = validate_and_normalize_hours(sub["task_items"])
+
+        return data

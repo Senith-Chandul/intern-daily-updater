@@ -165,11 +165,39 @@ def test_missing_weekdays():
     print("[OK] find_missing_weekdays and manual edit line sync verified.")
 
 
+def test_email_importer():
+    from email_importer import load_config_data, save_config_data, load_history_data, save_history_data
+
+    with tempfile.TemporaryDirectory() as td:
+        temp_dir = Path(td)
+        # 1. Config save & load
+        cfg = {"startup_name": "Clovio", "intern_name": "Senith Sagarage"}
+        save_config_data(temp_dir, cfg)
+        loaded_cfg = load_config_data(temp_dir)
+        assert loaded_cfg["intern_name"] == "Senith Sagarage"
+        assert loaded_cfg["startup_name"] == "Clovio"
+
+        # 2. History save & load
+        hist = {
+            "last_submission": {"date": "2026-07-24"},
+            "submissions": {
+                "2026-07-24": {"date": "2026-07-24", "tasks_today": "Task 1"}
+            }
+        }
+        save_history_data(temp_dir, hist)
+        loaded_hist = load_history_data(temp_dir)
+        assert "2026-07-24" in loaded_hist["submissions"]
+        assert loaded_hist["last_submission"]["date"] == "2026-07-24"
+
+    print("[OK] Email importer configuration and history persistence verified.")
+
+
 if __name__ == "__main__":
     print("Running component tests...")
     test_schema_and_constants()
     test_hours_validation()
     test_payload_builder_and_history()
     test_missing_weekdays()
+    test_email_importer()
     print("\nALL VERIFICATION TESTS PASSED SUCCESSFULLY!")
 

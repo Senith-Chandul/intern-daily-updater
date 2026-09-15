@@ -1016,6 +1016,10 @@ body {
   overflow: hidden;
 }
 
+.m3-dialog-surface.modal-lg {
+  max-width: 760px;
+}
+
 .m3-dialog-header {
   display: flex;
   align-items: center;

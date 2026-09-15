@@ -29,6 +29,7 @@ from credentials import (
     test_gemini_api_key,
     mask_secret,
 )
+from email_importer import cli_import_confirmation_emails, import_confirmation_emails
 
 BASE_DIR = Path(__file__).parent
 
@@ -282,6 +283,7 @@ def main():
     parser.add_argument("--setup", action="store_true", help="Run interactive profile setup")
     parser.add_argument("--add-history", action="store_true", help="Manually add a past day's submission into history.json")
     parser.add_argument("--list-history", action="store_true", help="List all past recorded submissions in history.json")
+    parser.add_argument("--import-email", nargs="?", const="interactive", default=None, help="Import past updates from confirmation email(s) (file path or paste interactively)")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the local Web GUI Studio")
     parser.add_argument("--port", type=int, default=5000, help="Port for the Web GUI (default: 5000)")
     args = parser.parse_args()
@@ -305,6 +307,21 @@ def main():
     if args.setup:
         config = load_config()
         interactive_cli_setup(BASE_DIR, config, force=True)
+        return
+
+    if args.import_email:
+        config = load_config()
+        if args.import_email != "interactive" and Path(args.import_email).exists():
+            file_text = Path(args.import_email).read_text(encoding="utf-8")
+            try:
+                res = import_confirmation_emails(file_text, base_dir=BASE_DIR, model=config.get("gemini_model", "gemini-flash-latest"))
+                print(f"\n[Success] {res.get('message')}")
+                print(f"Profile: {res.get('profile')}")
+                print(f"Dates: {res.get('imported_dates')}\n")
+            except Exception as e:
+                print(f"\n[Error] Import failed: {e}\n")
+        else:
+            cli_import_confirmation_emails(BASE_DIR, config)
         return
 
     if args.list_history:
@@ -373,7 +390,8 @@ def main():
             print("  [1] Single date update (default today)")
             print("  [2] Batch Catch-Up (terminal stepper)")
             print("  [3] Launch Web GUI Studio (Recommended)")
-            mode_choice = input("Select mode [1/2/3, default 3]: ").strip()
+            print("  [4] Import past updates from Confirmation Email(s)")
+            mode_choice = input("Select mode [1/2/3/4, default 3]: ").strip()
             if mode_choice in ["3", "g", "gui", ""]:
                 try:
                     from web.app import run_server
@@ -393,6 +411,11 @@ def main():
                     dry_run=args.dry_run,
                 )
                 return
+            elif mode_choice in ["4", "import", "email"]:
+                cli_import_confirmation_emails(BASE_DIR, config)
+                config = load_config()
+                missing_weekdays = find_missing_weekdays(submitter.load_history().get("submissions", {}))
+                print(f"[Notice] You now have {len(missing_weekdays)} unsubmitted weekday(s).\n")
 
         date_input = input(f"Submission Date [default today: {today_str}]: ").strip()
         sub_date = date_input if date_input else today_str
